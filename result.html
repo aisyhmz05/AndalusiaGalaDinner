@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Table Number</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Alex+Brush&display=swap" rel="stylesheet">
+
+  <style>
+    /* Body & Gradient Background */
+    body {
+      margin: 0;
+      padding: 10px;
+      font-family: 'Cormorant Garamond', serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #000000, #1a1a1a, #f5f5f5, #bfbfbf);
+      background-size: 400% 400%;
+      animation: gradientShift 10s ease infinite;
+      color: #000;
+      position: relative;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      margin: 10px;
+      background: rgba(255,255,255,0.95);
+      padding: 20px 25px;
+      border-radius: 35px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      width: 85%;
+      max-width: 380px;
+      text-align: center;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+      animation: goldGlow 5s ease-in-out infinite alternate;
+    }
+
+    /* Gold glow animation */
+    @keyframes goldGlow {
+      0% { box-shadow: 0 0 25px rgba(212,175,55,0.5); border-color: rgba(212,175,55,0.5); }
+      50% { box-shadow: 0 0 50px rgba(212,175,55,0.9); border-color: rgba(212,175,55,0.9); }
+      100% { box-shadow: 0 0 25px rgba(212,175,55,0.5); border-color: rgba(212,175,55,0.5); }
+    }
+
+    /* ===== Header (Fade In + Fade Out) ===== */
+    h1.welcome {
+      font-size: 2rem;
+      font-weight: 500;
+      margin-bottom: 25px;
+      animation: fadeInOut 4s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; transform: translateY(-10px); }
+      50% { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin: 20px 0 10px;
+    }
+
+    /* Table Number & Lucky Draw Boxes */
+    .number-box {
+      position: relative;
+      padding: 25px 20px;
+      border: 2px solid #000;
+      border-radius: 12px;
+      font-size: 37px;
+      text-shadow: 0 0 8px rgba(212, 175, 55, 0.6), 0 0 15px rgba(212, 175, 55, 0.4); /* ✨ soft gold glow */
+      font-weight: bold;
+      margin-bottom: 25px;
+      background: #fff;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .number-box:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .number-box::before {
+      content: "";
+      position: absolute;
+      top:0; left:-150%;
+      width:80%; height:100%;
+      background: linear-gradient(120deg, rgba(128,128,128,0) 0%, rgba(128,128,128,0.5) 50%, rgba(128,128,128,0) 100%);
+      transform: skewX(-25deg);
+      animation: shimmerBox 4s infinite;
+    }
+    @keyframes shimmerBox {
+      0% { left:-150%; }
+      100% { left:125%; }
+    }
+
+    /* Back Button */
+    a.back-btn {
+      display: block;
+      padding: 12px 0;
+      border-radius: 10px;
+      background-color: #000;
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+    a.back-btn:hover { background-color: #333; }
+
+    footer {
+      font-family: 'Alex Brush', cursive;
+      font-size: 20px;
+      color: #444;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 360px) {
+      h1.welcome { font-size: 22px; }
+      h2 { font-size: 18px; }
+      .number-box { font-size: 28px; padding: 20px 15px; }
+      a.back-btn { font-size: 16px; padding: 10px 0; }
+      footer { font-size: 18px; }
+    }
+
+    .disclaimer {
+      color: #ff0000;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="welcome" id="welcomeMsg">Loading...</h1>
+
+    <h2>Nombor Meja:</h2>
+    <div class="number-box" id="tableNumber">Loading...</div>
+
+    <h2>Nombor Cabutan Bertuah:</h2>
+    <div class="number-box" id="luckyNumber">Loading...</div>
+
+    <div class="disclaimer">
+      *Screenshot untuk rujukan sendiri
+    </div>
+
+    <a href="index.html" class="back-btn">Kembali</a>
+
+    <footer>Seribu Memori, Sejuta Impian</footer>
+  </div>
+
+  <script>
+ const staffList = [
+
+{ EmployeeID: "014", Name: "YUSMIZI BIN MD YUSOF", TableNo: "1" },
+{ EmployeeID: "013", Name: "NURUL AINNA BINTI ADNAN", TableNo: "1" },
+{ EmployeeID: "008", Name: "ZALINA BINTI TARMIZE", TableNo: "1" },
+
+{ EmployeeID: "039", Name: "NORRUL BALQES BINTI ABU BAKER", TableNo: "2" },
+{ EmployeeID: "045", Name: "NUR ARIFF BIN MOHD ISA", TableNo: "2" },
+{ EmployeeID: "067", Name: "NORHAFIZA BINTI ZAINAL ABIDIN", TableNo: "2" },
+
+{ EmployeeID: "003", Name: "NOR AZILAH AHMAD", TableNo: "4" },
+
+{ EmployeeID: "528", Name: "MOHAMMAD HILMI BIN DRAHIM", TableNo: "5" },
+{ EmployeeID: "988", Name: "ABDUL GHANI BIN IZRAM", TableNo: "5" },
+{ EmployeeID: "907", Name: "NURUL SYAHIRAH SYAIRAH BINTI MOHD ZAMRI", TableNo: "5" },
+{ EmployeeID: "333", Name: "FAZLINA BINTI ABDUL MUTALIB", TableNo: "5" },
+{ EmployeeID: "111", Name: "SITI AMINAH BINTI ZAKARIA [PENGURUS]", TableNo: "5" },
+{ EmployeeID: "815", Name: "NUR AI SYIKIN BINTI LORETO", TableNo: "5" },
+{ EmployeeID: "900", Name: "NUR FAKHIRAH BINTI MARDHI", TableNo: "5" },
+{ EmployeeID: "703", Name: "ASMIDA BINTI KHOLED", TableNo: "5" },
+{ EmployeeID: "761", Name: "MOHAMMAD AMIRUL HUSRA BIN ISMIL @ ISMAIL", TableNo: "5" },
+
+{ EmployeeID: "086", Name: "MUHAMMAD MAHFUDZ AZZALLY BIN HAKIM", TableNo: "6" },
+{ EmployeeID: "012", Name: "NURHAYATI BINTI MOHD RODZI", TableNo: "6" },
+{ EmployeeID: "083", Name: "TENGKU AZWANIS BINTI TENGKU ALIAS", TableNo: "6" },
+
+{ EmployeeID: "683", Name: "ANIS NADHIRAH BINTI MOHD ALI", TableNo: "9" },
+{ EmployeeID: "298", Name: "NURSYAKILA SUZANA BINTI ZULKIFLI", TableNo: "9" },
+{ EmployeeID: "968", Name: "NUR AMEERA SOFEA BINTI MUSTAKIM", TableNo: "9" },
+{ EmployeeID: "998", Name: "NUR ATHIRAH BINTI AHMAD FAUZI", TableNo: "9" },
+{ EmployeeID: "930", Name: "MOHD HASRUL BIN ABD LATIF", TableNo: "9" },
+{ EmployeeID: "731", Name: "AMAR ARIZAL BIN ALIAS", TableNo: "9" },
+{ EmployeeID: "10007", Name: "NIK AHMAD FAREZ BIN NIK GHAZALI [PENGURUS]", TableNo: "9" },
+{ EmployeeID: "3002", Name: "NURZALIZA BINTI ZAMBERI", TableNo: "9" },
+{ EmployeeID: "772", Name: "NUR MAISARAH BINTI OTHMAN", TableNo: "9" },
+{ EmployeeID: "3001", Name: "WAN NORASIKIN BINTI WAN IBRAHIM", TableNo: "9" },
+
+
+{ EmployeeID: "959", Name: "SITI AISYAH BINTI MUHAMMAD SOLLEH RAVINDRAN", TableNo: "10" },
+{ EmployeeID: "163", Name: "MOHAMAD HAFIZ BIN MOHD MISNAN", TableNo: "10" },
+{ EmployeeID: "695", Name: "MUHAMMAD AMIN NASRIN BIN MOHD ZAHID", TableNo: "10" },
+{ EmployeeID: "10012", Name: "ZAINAB BINTI HARIS [PENGURUS]", TableNo: "10" },
+{ EmployeeID: "355", Name: "MUHAR BIN KADIMON", TableNo: "10" },
+{ EmployeeID: "668", Name: "MOHAMAD ALIFF BIN MOHAMAD", TableNo: "10" },
+{ EmployeeID: "970", Name: "MUHAMMAD ZULHAIRY AZHARI BIN MOHAMAD ZAINI", TableNo: "10" },
+{ EmployeeID: "622", Name: "MUHAMMAD IMRAN SAUFI BIN ROSLI", TableNo: "10" },
+{ EmployeeID: "227", Name: "FATIN NABILAH BINTI AZMAN", TableNo: "10" },
+{ EmployeeID: "018", Name: "SITI NUR SYAHIRAH BINTI ABDUL RAMAN", TableNo: "10" },
+
+{ EmployeeID: "892", Name: "AHMAD NAQUIYUDDIN MOKHZANI BIN BAHASAN [PA]", TableNo: "11" },
+{ EmployeeID: "880", Name: "WAN NOOR AIMI FAIRUZ BINTI W. JUSOH", TableNo: "11" },
+{ EmployeeID: "858", Name: "MUHAMAD NAIM BIN ISMAIL", TableNo: "11" },
+{ EmployeeID: "608", Name: "LILI SUZANA BINTI AZIZ", TableNo: "11" },
+{ EmployeeID: "723", Name: "NUR NAJWA WAFDIYAH BINTI R IZMI", TableNo: "11" },
+{ EmployeeID: "675", Name: "SITI HAJAR BINTI MARDZI", TableNo: "11" },
+{ EmployeeID: "648", Name: "SITI UMAIRAH BINTI SUZALI", TableNo: "11" },
+{ EmployeeID: "610", Name: "NUR SHAHIRA BINTI SHAHARUDDIN", TableNo: "11" },
+{ EmployeeID: "700", Name: "NURHANI BINTI JOHARY", TableNo: "11" },
+{ EmployeeID: "581", Name: "SAIDATINA NURMAISARAH BINTI JUMAHAT", TableNo: "11" },
+
+{ EmployeeID: "756", Name: "MUHAMMAD AMIRUL FITRI BIN MAZLAN [PPA]", TableNo: "12" },
+{ EmployeeID: "909", Name: "SUMAIYA BINTI MASRI", TableNo: "12" },
+{ EmployeeID: "122", Name: "ABDUL MUKHSIN BIN AHMAD TAJUDDIN [PENGURUS]", TableNo: "12" },
+{ EmployeeID: "279", Name: "MEOR SYAFIQ BIN MOKHTAR [PPA]", TableNo: "12" },
+{ EmployeeID: "778", Name: "NUR FATIN HAZWANI BINTI MOHD FAUZI", TableNo: "12" },
+{ EmployeeID: "1030", Name: "AKMAL HAKIM BIN UMAR", TableNo: "12" },
+{ EmployeeID: "698", Name: "MUHAMMAD NAIM BIN SHAHARUDIN", TableNo: "12" },
+{ EmployeeID: "764", Name: "AMIR AIMAN BIN ISMAIL", TableNo: "12" },
+{ EmployeeID: "781", Name: "NUR FATIHA BINTI OTHMAN", TableNo: "12" },
+{ EmployeeID: "896", Name: "NUR SYAMIMI BINTI MOHD KHAIRUL NIZAM", TableNo: "12" },
+
+{ EmployeeID: "808", Name: "NURSYAFINAZ BINTI AHMAD ZAINI", TableNo: "13" },
+{ EmployeeID: "1061", Name: "RUZIANI BINTI MAT HUSIN", TableNo: "13" },
+{ EmployeeID: "697", Name: "NUR AISHAH SUHANA BINTI ABDUL RAHMAN", TableNo: "13" },
+{ EmployeeID: "918", Name: "NUR SHAKIRIN BINTI RUZLAN", TableNo: "13" },
+{ EmployeeID: "589", Name: "MUHAMMAD QAMARUL ARIF BIN MAT DAUD [PPA]", TableNo: "13" },
+{ EmployeeID: "1020", Name: "MOHAMMAD IQBAL BIN SALLEH", TableNo: "13" },
+{ EmployeeID: "057", Name: "NUR AZUREEN BINTI MOHD ANUAR", TableNo: "13" },
+{ EmployeeID: "677", Name: "RABIEATUL ADAWIYAH BINTI MOHD RIZAL", TableNo: "13" },
+{ EmployeeID: "319", Name: "MOHD JAFFERI BIN JASMIN", TableNo: "13" },
+{ EmployeeID: "034", Name: "NOORDIN BIN YUSOFF", TableNo: "13" },
+
+{ EmployeeID: "531", Name: "AHMAD HAKIM BIN LUKMANUL HAKIM [PENGURUS]", TableNo: "14" },
+{ EmployeeID: "850", Name: "MUHAMMAD FARID BIN ISMAIL [PA]", TableNo: "14" },
+{ EmployeeID: "885", Name: "ROY ANDIKA BIN SOEHARTO [PA]", TableNo: "14" },
+{ EmployeeID: "846", Name: "NUR ANIS ATHIRAH BINTI NOOR BUHAIRI", TableNo: "14" },
+{ EmployeeID: "859", Name: "AHMAD FARHAN BIN MOHD AMLI [PA]", TableNo: "14" },
+{ EmployeeID: "601", Name: "NURUL SHAFWANIE BINTI SHAIFUL BAHARI", TableNo: "14" },
+{ EmployeeID: "908", Name: "MUHAMMAD AIMAN BIN MOHD MUNIR", TableNo: "14" },
+{ EmployeeID: "666", Name: "NURULIZZAH ADILAH BINTI OTHMAN", TableNo: "14" },
+{ EmployeeID: "074", Name: "SAFWAN MAHDAKAH", TableNo: "14" },
+
+{ EmployeeID: "735", Name: "INTAN SOPIAH BINTI YAAKOB", TableNo: "15" },
+{ EmployeeID: "704", Name: "UMI AISYAH BINTI MAKHTAR", TableNo: "15" },
+{ EmployeeID: "934", Name: "SITI SYADRATUL ALYA BINTI SAMSUDIN", TableNo: "15" },
+{ EmployeeID: "949", Name: "MOHAMMAD SOLEHIN BIN HANAFI [PA]", TableNo: "15" },
+{ EmployeeID: "893", Name: "MUHAMMAD ASRIE BIN SATAR [PA]", TableNo: "15" },
+{ EmployeeID: "239", Name: "MOHD HAZIM FIKRI BIN MD NADZRI", TableNo: "15" },
+{ EmployeeID: "033", Name: "SURAYA BINTI HASSAN", TableNo: "15" },
+{ EmployeeID: "225", Name: "SITI RASHIDAH BINTI MOHD IDRIS", TableNo: "15" },
+{ EmployeeID: "732", Name: "NUR NABILAH BINTI ABDUL RAHMAN", TableNo: "15" },
+{ EmployeeID: "897", Name: "MUHAMMAD HAFIZ BIN HASNOL HADI", TableNo: "15" },
+
+{ EmployeeID: "1001", Name: "NURFARISYA BT MUHAMED", TableNo: "16" },
+{ EmployeeID: "714", Name: "ISKANDAR ZULKARNAIN BIN JAMALUDDIN [PPA]", TableNo: "16" },
+{ EmployeeID: "989", Name: "LOKMANUL HAKIM BIN ISMAIL [PA]", TableNo: "16" },
+{ EmployeeID: "1044", Name: "MOHAMMAD AMIRUDDIN BIN ROZI [PA]", TableNo: "16" },
+{ EmployeeID: "742", Name: "SITI HATIKAH BINTI ABDUL LATIF", TableNo: "16" },
+{ EmployeeID: "867", Name: "ALIA HANIN BINTI ADLY", TableNo: "16" },
+{ EmployeeID: "645", Name: "NURAUNI SYAZA BINTI SHAFIE", TableNo: "16" },
+{ EmployeeID: "898", Name: "NUR ROSALINDA BINTI MASIDI", TableNo: "16" },
+{ EmployeeID: "779", Name: "NUR ARIFAH AYUNI BINTI ABDULLAH", TableNo: "16" },
+{ EmployeeID: "997", Name: "MOHAMMAD DANIEL HAIKAL BIN MOHD FIKRI AMIN", TableNo: "16" },
+
+{ EmployeeID: "638", Name: "NURUL IZZATI BINTI AHMAD WAHID", TableNo: "17" },
+{ EmployeeID: "749", Name: "NURUL NAJWA BINTI ASNAWI", TableNo: "17" },
+{ EmployeeID: "993", Name: "NORFASHIHAH IZZATI BINTI ROHAIZAD", TableNo: "17" },
+{ EmployeeID: "870", Name: "MUHAMMAD HISYAMUDDIN BIN JUNAIDI", TableNo: "17" },
+{ EmployeeID: "780", Name: "MUHAMMAD FARIS ARSYAD BIN ROSLAN", TableNo: "17" },
+{ EmployeeID: "969", Name: "MUHAMMAD AMMAR BIN MOHD AZMAN", TableNo: "17" },
+{ EmployeeID: "670", Name: "ALSAHID BIN KASMAT", TableNo: "17" },
+{ EmployeeID: "678", Name: "NURFATHIAH BINTI SAHAWALUDIN", TableNo: "17" },
+{ EmployeeID: "679", Name: "MUHAMMAD SYAZWAN HAZIQ BIN SOHEME", TableNo: "17" },
+{ EmployeeID: "883", Name: "MUHAMMAD IKHRAAM BIN MUSTAPAH", TableNo: "17" },
+
+{ EmployeeID: "527", Name: "ASIS BIN TAHANG", TableNo: "18" },
+{ EmployeeID: "976", Name: "MIRNAH BINTI KADIR", TableNo: "18" },
+{ EmployeeID: "923", Name: "SOFIAH BINTI HARAZIAN", TableNo: "18" },
+{ EmployeeID: "873", Name: "AIMAN SYAHMI BIN AZHARI", TableNo: "18" },
+{ EmployeeID: "962", Name: "MUHAMMAD HANAFI BIN 'AZMI [PA]", TableNo: "18" },
+{ EmployeeID: "726", Name: "NURUL WARDAH BINTI BADRUL HISHAM", TableNo: "18" },
+{ EmployeeID: "371", Name: "ROHANA BINTI ZULKALI", TableNo: "18" },
+{ EmployeeID: "651", Name: "NURUL ILLYANA BINTI AZMAN", TableNo: "18" },
+{ EmployeeID: "702", Name: "NUR FATANAH BINTI MOHD ALLIF EFFENDY", TableNo: "18" },
+{ EmployeeID: "986", Name: "NURUL HUSNA BINTI ISMUT", TableNo: "18" },
+
+{ EmployeeID: "132", Name: "WAN NURUL NADIA BINTI WAN AB RAHMAN [PENGURUS]", TableNo: "19" },
+{ EmployeeID: "1075", Name: "MUHAMMAD ANAS SYAHMI BIN RAMLI", TableNo: "19" },
+{ EmployeeID: "178", Name: "MUHAMMAD FAISAL BIN MOHD SHUKOR [PENYELIA]", TableNo: "19" },
+{ EmployeeID: "958", Name: "SAFIA ADDAWIYAH BINTI ZAINOL", TableNo: "19" },
+{ EmployeeID: "800", Name: "MUHAMAD HELMY TERDIDI [PA IPOH]", TableNo: "19" },
+{ EmployeeID: "380", Name: "NUR SARAH BINTI MOHAMMAD ALI", TableNo: "19" },
+{ EmployeeID: "686", Name: "AIN ZULAIKHA BINTI RUSLI", TableNo: "19" },
+{ EmployeeID: "839", Name: "SITI NUR FATHAH BINTI ABDUL RAMAN", TableNo: "19" },
+{ EmployeeID: "818", Name: "MOHD AZIZUL HAKIM BIN M.ROKHANI", TableNo: "19" },
+{ EmployeeID: "882", Name: "MUHAMMAD SYAHRUS SABRI BIN RUSLI", TableNo: "19" },
+
+{ EmployeeID: "955", Name: "MUHAMMAD ANKASHAH BIN CHE AZMAN [PA]", TableNo: "20" },
+{ EmployeeID: "592", Name: "MOHD HANIF BIN MOHD SALEHEN", TableNo: "20" },
+{ EmployeeID: "874", Name: "ANAS SYAZWAN BIN AHMAD SHAFINGI FIKRI", TableNo: "20" },
+{ EmployeeID: "1032", Name: "MOHAMAD AKMAL BIN ABD HALIM", TableNo: "20" },
+{ EmployeeID: "356", Name: "AZLINDA BINTI KAMALUDDIN", TableNo: "20" },
+{ EmployeeID: "733", Name: "NURHAZIRAH BINTI ZAINUDIN", TableNo: "20" },
+{ EmployeeID: "607", Name: "NUR IZZAH BINTI ABDUL PATAH", TableNo: "20" },
+{ EmployeeID: "249", Name: "MUHAMMAD AMINUDDIN BIN YUSOF", TableNo: "20" },
+{ EmployeeID: "849", Name: "RAJA MUHAMAD HARIZ BIN RAJA SHAHRUZZAMAN", TableNo: "20" },
+{ EmployeeID: "884", Name: "MUHAMMAD ERIQ ZAID BIN MOHD ZAILAN", TableNo: "20" },
+
+{ EmployeeID: "707", Name: "MUHAMMAD ARIEF HAKIMI BIN ABDUL RAZAK", TableNo: "21" },
+{ EmployeeID: "777", Name: "MUHAMMAD MUAZ BIN SHAHRUL NIZA", TableNo: "21" },
+{ EmployeeID: "845", Name: "AZAMUDDIN FIKRI BIN ABAS [PA]", TableNo: "21" },
+{ EmployeeID: "164", Name: "AHMAD MUAZ BIN ALL BAKRY [PENGURUS]", TableNo: "21" },
+{ EmployeeID: "919", Name: "ANAS SYAKIRIN BIN AHMAD SABKI", TableNo: "21" },
+{ EmployeeID: "027", Name: "SITI HAJAR BINTI RAZALI", TableNo: "21" },
+{ EmployeeID: "026", Name: "MASSITA BINTI KHALIDDIN", TableNo: "21" },
+{ EmployeeID: "153", Name: "NURBAITI BINTI YUNOS", TableNo: "21" },
+{ EmployeeID: "535", Name: "NUROL IHSAN BINTI WAHAB [PEN PENGURUS]", TableNo: "21" },
+{ EmployeeID: "066", Name: "WAN DAYANA BINTI NORRNI", TableNo: "21" },
+
+{ EmployeeID: "956", Name: "SHIRNAH BINTI MADNASIL", TableNo: "22" },
+{ EmployeeID: "738", Name: "SYARWANIE NATASYA BINTI BUNIAMIN", TableNo: "22" },
+{ EmployeeID: "973", Name: "MUHAMMAD SAIFUL ASYRAF BIN ABDULLAH [PA]", TableNo: "22" },
+{ EmployeeID: "542", Name: "WAN RUHANI BINTI WAN HUSSIN [PENGURUS]", TableNo: "22" },
+{ EmployeeID: "10006", Name: "MAZLINA BINTI GHAZALLI [PENGURUS]", TableNo: "22" },
+{ EmployeeID: "1038", Name: "NURUL NABILAH BINTI MOHD FAZLI", TableNo: "22" },
+{ EmployeeID: "611", Name: "ULIL NUHA BINTI IBRAHIM", TableNo: "22" },
+{ EmployeeID: "567", Name: "NURUL NADRAH BINTI HASSAN", TableNo: "22" },
+{ EmployeeID: "926", Name: "SITI ZAINAB ZULFA BINTI ZULKIFLEE LUBES", TableNo: "22" },
+{ EmployeeID: "829", Name: "INTAN SHAFINAZ BINTI MOHD ASRI", TableNo: "22" },
+
+{ EmployeeID: "646", Name: "AQLY BIN YACOB [PPA]", TableNo: "23" },
+{ EmployeeID: "139", Name: "NOOR AZAH BINTI AHMAD [PENGURUS]", TableNo: "23" },
+{ EmployeeID: "770", Name: "NURRAFIDAH BINTI SUDIN", TableNo: "23" },
+{ EmployeeID: "933", Name: "MOHAMED FAISAL BIN NA SHAIK ALLAUDIN", TableNo: "23" },
+{ EmployeeID: "921", Name: "MUNIR BIN BADLI", TableNo: "23" },
+{ EmployeeID: "035", Name: "NOR ADILAH BINTI ZAINUDIN", TableNo: "23" },
+{ EmployeeID: "431", Name: "YUSZURA AFFEEZA BINTI MOHD YUSOFF", TableNo: "23" },
+{ EmployeeID: "1003", Name: "AFIQ AMSYAR BIN SAIFUDDIN", TableNo: "23" },
+{ EmployeeID: "784", Name: "SITI MUFLIHAH BINTI BAKHTIAR", TableNo: "23" },
+{ EmployeeID: "793", Name: "HAMIRUDDIN HASHIM", TableNo: "23" },
+
+{ EmployeeID: "931", Name: "AZLIN SAFENA BINTI AZIHAR", TableNo: "24" },
+{ EmployeeID: "10009", Name: "MOHD NA'IM BIN ABU BAKAR [PENGURUS]", TableNo: "24" },
+{ EmployeeID: "119", Name: "SITI NOR AZIANI BINTI YAHYA", TableNo: "24" },
+{ EmployeeID: "052", Name: "FATIN IZZATI BINTI AHMAD SHARIFUDIN", TableNo: "24" },
+{ EmployeeID: "1031", Name: "MOHAMMAD IHSAN BIN ISHAK", TableNo: "24" },
+{ EmployeeID: "449", Name: "NURUL AKMAR BINTI MOHD SUHAIMI", TableNo: "24" },
+{ EmployeeID: "037", Name: "NORAZLINA MOHD GHAZALI", TableNo: "24" },
+{ EmployeeID: "983", Name: "NOOR SABRINA BINTI MUHAMAD RAZALI", TableNo: "24" },
+{ EmployeeID: "727", Name: "ROHANA BINTI MOHD NOR", TableNo: "24" },
+{ EmployeeID: "835", Name: "NURULHUDA BINTI IZHAR", TableNo: "24" },
+
+{ EmployeeID: "1036", Name: "MUHAMMAD LOKMAN BIN ZULKIFLI", TableNo: "25" },
+{ EmployeeID: "174", Name: "NURUL SHAZWANI BINTI AHMAD", TableNo: "25" },
+{ EmployeeID: "143", Name: "AHMAD AMIRUL AMIN BIN AZMI [PENGURUS]", TableNo: "25" },
+{ EmployeeID: "963", Name: "MOHAMAD AMREEL IMAN BIN ABD MALEK", TableNo: "25" },
+{ EmployeeID: "590", Name: "MUHAMMAD IKHRAM BIN SAMSUDIN [PPA]", TableNo: "25" },
+{ EmployeeID: "728", Name: "MUHAMMAD FAIZ BIN YUSOF", TableNo: "25" },
+{ EmployeeID: "077", Name: "SITI HADIJAH BINTI ISMAIL", TableNo: "25" },
+{ EmployeeID: "994", Name: "NOREEN IZZATI AQMA BINTI AD AZMAN", TableNo: "25" },
+{ EmployeeID: "640", Name: "SITI NURSYAHIRAH BINTI AHMAD SHAFIE", TableNo: "25" },
+{ EmployeeID: "938", Name: "MOHAMAD SHAHRUL ASRAF BIN ZULKEFLI", TableNo: "25" },
+
+{ EmployeeID: "154", Name: "NOR FARAHIN BINTI MOHD YOUSOF", TableNo: "26" },
+{ EmployeeID: "946", Name: "NURAZARIA BINTI BEK", TableNo: "26" },
+{ EmployeeID: "569", Name: "NUR 'ATIF IMANI BINTI MOHAMAD ALI", TableNo: "26" },
+{ EmployeeID: "544", Name: "NURAIN SABIHAN BINTI AZIZ", TableNo: "26" },
+{ EmployeeID: "597", Name: "AHMAD BUKHORI BIN MOHD IDRIS", TableNo: "26" },
+{ EmployeeID: "942", Name: "ZAFRAN ARIF BIN ZALIZAN", TableNo: "26" },
+{ EmployeeID: "890", Name: "MUHAMMAD AMIRUL HAKIEM BIN MUSTAFFA", TableNo: "26" },
+{ EmployeeID: "945", Name: "NURUL ARISYA BINTI MOHAMAD ALI", TableNo: "26" },
+{ EmployeeID: "953", Name: "NUR ELLESYA BINTI BADRUL AZMAN", TableNo: "26" },
+{ EmployeeID: "578", Name: "FIFI NUR SYAQIRAH BINTI AZMAN", TableNo: "26" },
+
+{ EmployeeID: "616", Name: "AHMAD AIMAN BIN MOHAMAD ZAMRY [PPA]", TableNo: "27" },
+{ EmployeeID: "975", Name: "NUR AQILAH BINTI ZULKIFLI HASHIM", TableNo: "27" },
+{ EmployeeID: "771", Name: "NURUL DALILAH BINTI MOHAMED NASIR", TableNo: "27" },
+{ EmployeeID: "759", Name: "ABDUL SHAMAD RIMI", TableNo: "27" },
+{ EmployeeID: "748", Name: "FATIN NABILA BINTI ABDUL AZIM", TableNo: "27" },
+{ EmployeeID: "1017", Name: "ZALIKHA SHAZWANI BINTI ZAINAL BADRI", TableNo: "27" },
+{ EmployeeID: "783", Name: "NURAZIZAH BINTI ISMAIL", TableNo: "27" },
+{ EmployeeID: "1037", Name: "WAN NOR SYAFIQAH BALQIS", TableNo: "27" },
+{ EmployeeID: "941", Name: "AMEERA SOFEA BINTI ABDULLAH", TableNo: "27" },
+{ EmployeeID: "1006", Name: "AMMARAH DIYANAH BINTI MOHD AZHAR", TableNo: "27" },
+
+{ EmployeeID: "553", Name: "MUHAMMAD SAFWAN BIN SHAMSUDIN", TableNo: "28" },
+{ EmployeeID: "558", Name: "NURUL ADIBAH BINTI LURMAN", TableNo: "28" },
+{ EmployeeID: "440", Name: "ROSMAZIHAN BINTI AZIZAN", TableNo: "28" },
+{ EmployeeID: "957", Name: "NOR FAZLINAZIRA BINTI MALLI", TableNo: "28" },
+{ EmployeeID: "981", Name: "MOHAMAD ARIF IQRA IZZ BIN ANUAR", TableNo: "28" },
+{ EmployeeID: "658", Name: "FARAH NABILA BINTI ZUHAIRI", TableNo: "28" },
+{ EmployeeID: "232", Name: "IKE PURNAWASARI BINTI RAHEM", TableNo: "28" },
+{ EmployeeID: "802", Name: "FARHAH SYIFAA' BINTI MOHAMAD FARID", TableNo: "28" },
+{ EmployeeID: "840", Name: "NUR AISYAH BT RAZEN KHAN", TableNo: "28" },
+{ EmployeeID: "987", Name: "NUR NAZIRAH BINTI ABD RASHID", TableNo: "28" },
+
+{ EmployeeID: "864", Name: "NUR ATHIRAH BINTI RAZALI", TableNo: "29" },
+{ EmployeeID: "944", Name: "NOORSHAHIRAH IZZATIE BINTI MOHD NOR", TableNo: "29" },
+{ EmployeeID: "551", Name: "USAID FAHMI BIN BARDAN", TableNo: "29" },
+{ EmployeeID: "832", Name: "SHAFIRUL QAMA BIN SHAHARMAN", TableNo: "29" },
+{ EmployeeID: "268", Name: "MOHD EZUADE BIN MOHAMED YUSOFF [PENGURUS]", TableNo: "29" },
+{ EmployeeID: "984", Name: "FATEN NADIA BINTI ABU BAKAR", TableNo: "29" },
+{ EmployeeID: "432", Name: "SITI AMINAH BINTI IDRIS", TableNo: "29" },
+{ EmployeeID: "895", Name: "SYARIFAH NUR AISHAH UMAIRAH BINTI SYED IDRIS", TableNo: "29" },
+{ EmployeeID: "889", Name: "NUR HUSNINA BINTI SUHAIMI", TableNo: "29" },
+{ EmployeeID: "924", Name: "MUHAMMAD HASIFFIDDIN BIN MOHD HAFIZI", TableNo: "29" },
+
+{ EmployeeID: "1073", Name: "FARHAN ABID BIN OMAR", TableNo: "30" },
+{ EmployeeID: "834", Name: "SITI NORAISHAH BINTI AZAHAR", TableNo: "30" },
+{ EmployeeID: "669", Name: "HAMIZAH BINTI ZULKIFLI", TableNo: "30" },
+{ EmployeeID: "10001", Name: "RIDWAN ABDULLAH [PENGURUS]", TableNo: "30" },
+{ EmployeeID: "966", Name: "NUR ASMAA MURSYIDAH BINTI ZAKARIA", TableNo: "30" },
+{ EmployeeID: "575", Name: "NUR FARHANAH BINTI YAHYA", TableNo: "30" },
+{ EmployeeID: "693", Name: "NURUL HAIFARUNNISA BINTI RIZAL", TableNo: "30" },
+{ EmployeeID: "687", Name: "NUR NASHIRAH BT ABD RAHMAN", TableNo: "30" },
+{ EmployeeID: "972", Name: "MUHAMMAD ALI BIN ZULKEFLE", TableNo: "30" },
+{ EmployeeID: "619", Name: "NUR ARINA SYAIRAH BINTI RAMLI", TableNo: "30" },
+
+{ EmployeeID: "148", Name: "NUR ZAIDA BINTI MANSOR", TableNo: "31" },
+{ EmployeeID: "899", Name: "MUHAMMAD SAFARAZ BIN MISNAN", TableNo: "31" },
+{ EmployeeID: "10008", Name: "HAJI ABU BAKAR BIN CHE NGAH [PENGURUS]", TableNo: "31" },
+{ EmployeeID: "181", Name: "SITI NURUL AMALINA BINTI JALIL", TableNo: "31" },
+{ EmployeeID: "725", Name: "RAZIN HAFIZI BIN RAHIMI", TableNo: "31" },
+{ EmployeeID: "641", Name: "MUHAMMAD KHAIRIL AZIZI BIN MOHD YUNUS", TableNo: "31" },
+{ EmployeeID: "950", Name: "MUHAMMAD ROHAIZAD BIN MOHD NOH", TableNo: "31" },
+{ EmployeeID: "394", Name: "NOR DIYANA BINTI SHAMSUDIN", TableNo: "31" },
+{ EmployeeID: "243", Name: "ATIQAH BINTI IBRAHIM", TableNo: "31" },
+
+{ EmployeeID: "667", Name: "MUHAMMAD AL AMIN BIN ROZALI", TableNo: "32" },
+{ EmployeeID: "871", Name: "FASIHAH BINTI ABD BASID", TableNo: "32" },
+{ EmployeeID: "539", Name: "NUR DANIA HUDA BINTI NORHISHAM", TableNo: "32" },
+{ EmployeeID: "568", Name: "MUHAMMAD KHALID ARIFF BIN HANAWI", TableNo: "32" },
+{ EmployeeID: "603", Name: "AAINAA IZZATI BINTI AZMAN", TableNo: "32" },
+{ EmployeeID: "999", Name: "MUHAMMAD ASYRAF JADID BIN AHMAD", TableNo: "32" },
+{ EmployeeID: "224", Name: "MUHAMMAD AFIQ HAIKAL BIN MOHD NOR", TableNo: "32" },
+{ EmployeeID: "754", Name: "AHMAD ZHARFAN BIN ZAMBREE", TableNo: "32" },
+{ EmployeeID: "991", Name: "MUHAMMAD HAZIQ BIN KHAIRUDDIN", TableNo: "32" },
+{ EmployeeID: "110", Name: "NURUL NADZIRAH BINTI TS MOHD KHAIRRUDIN", TableNo: "32" },
+{ EmployeeID: "719", Name: "WAN NORAFIZAH BINTI JUMALI", TableNo: "33" },
+
+{ EmployeeID: "696", Name: "SHEIKH UTHMAN HAQIMIE BIN SHEIKH AHMAD BASHIR", TableNo: "33" },
+{ EmployeeID: "952", Name: "ALIF IKMAL BIN OMAR", TableNo: "33" },
+{ EmployeeID: "708", Name: "ZAINUL IBAD BIN SYAF'II", TableNo: "33" },
+{ EmployeeID: "943", Name: "WAN NUR SUHAILI BINTI WAN MAZAHA", TableNo: "33" },
+{ EmployeeID: "571", Name: "EARNY WAHIDA BINTI SHAMSUDIN", TableNo: "33" },
+{ EmployeeID: "857", Name: "MUHAMMAD AEIMAN BIN AB GHANI", TableNo: "33" },
+{ EmployeeID: "171", Name: "NUR AIN BINTI MISPARDI", TableNo: "33" },
+{ EmployeeID: "089", Name: "SHAHIZALINA BINTI KHAZALI", TableNo: "33" },
+{ EmployeeID: "1011", Name: "SHARIFAH BALQIS LUBNA BINTI SAYED HASSAN", TableNo: "33" },
+
+{ EmployeeID: "865", Name: "MUHAMMAD IRFAN BIN HALIM", TableNo: "34" },
+{ EmployeeID: "10011", Name: "MAIZATUL AKMAR BINTI ABDUL SAMMAD [PENGURUS]", TableNo: "34" },
+{ EmployeeID: "712", Name: "MUHAMMAD FITRI BIN ZAKARIA", TableNo: "34" },
+{ EmployeeID: "925", Name: "JAMALUL IZZAT BIN JAMALUL IKRAM", TableNo: "34" },
+{ EmployeeID: "985", Name: "NURUL IRRA NATASHA BINTI AZMI", TableNo: "34" },
+{ EmployeeID: "967", Name: "NORSHAIRA BINTI BAHARUDIN", TableNo: "34" },
+{ EmployeeID: "1010", Name: "MUHAMMAD MUQRIS NAIM BIN MOHD SAIFULNIZAM", TableNo: "34" },
+{ EmployeeID: "3003", Name: "MOHAMMAD NATASHA BIN OMAR", TableNo: "34" },
+{ EmployeeID: "1039", Name: "MOHAMAD AMIRUL AIMAN BIN ABDUL HALIM", TableNo: "34" },
+{ EmployeeID: "692", Name: "MOHAMAD SAZWAN BIN AB RAHIM", TableNo: "34" },
+
+{ EmployeeID: "856", Name: "MUHAMMAD ZAMADI BIN ZAKARIA", TableNo: "35" },
+{ EmployeeID: "825", Name: "NOORAINI HAYATI BINTI MOHD NOR", TableNo: "35" },
+{ EmployeeID: "877", Name: "FILZAH ARDINI BINTI YAZID", TableNo: "35" },
+{ EmployeeID: "965", Name: "MUHAMMAD HAZIQ BIN SHAHUDIN", TableNo: "35" },
+{ EmployeeID: "879", Name: "ABDUL RAHMAN BIN ISMAIL", TableNo: "35" },
+{ EmployeeID: "789", Name: "NURIN MADIHAH BINTI MUHAMMAD", TableNo: "35" },
+{ EmployeeID: "559", Name: "NURINA ATHIRAH BINTI MOHD KHAIRUDIN", TableNo: "35" },
+{ EmployeeID: "996", Name: "NURADILA BINTI ABD RASHID", TableNo: "35" },
+{ EmployeeID: "757", Name: "NAZMEEN ZANIRAH BINTI MOHD ESA", TableNo: "35" },
+{ EmployeeID: "401", Name: "NURIYAH YAKIN BINTI AINAL YAKIN", TableNo: "35" },
+
+{ EmployeeID: "960", Name: "UMI SAADAH BINTI ABDUL RAHMAN", TableNo: "36" },
+{ EmployeeID: "709", Name: "MUHAMMAD ADIB HUSAINI BIN MD NOOR", TableNo: "36" },
+{ EmployeeID: "806", Name: "MOHD AZAM BIN MAT SAAED @ MOHD SHOIB [PA]", TableNo: "36" },
+{ EmployeeID: "655", Name: "MUHAMMAD AMIR SHAHMIE BIN AZHAR", TableNo: "36" },
+{ EmployeeID: "744", Name: "HADFINA ELIANE BINTI HAJEMAT", TableNo: "36" },
+{ EmployeeID: "602", Name: "NUR ATIQAH BINTI ZAKARIA", TableNo: "36" },
+{ EmployeeID: "618", Name: "MUHAMMAD SYAZRUL HAQIM BIN SOHEME", TableNo: "36" },
+{ EmployeeID: "3009", Name: "SITI ZAHIRA BINTI RUSDAN", TableNo: "36" },
+{ EmployeeID: "024", Name: "FAIZAH BINTI JAAFAR", TableNo: "36" },
+{ EmployeeID: "221", Name: "ALYAA' 'AMIRAH BINTI RIF'AT", TableNo: "36" },
+
+{ EmployeeID: "626", Name: "NUR SYAHINDAH SUFIAH BINTI ABDUL RAHIM", TableNo: "37" },
+{ EmployeeID: "722", Name: "SYAHRUL NIZAM BIN SHAMSUDDIN", TableNo: "37" },
+{ EmployeeID: "246", Name: "MOHD YUSOF BIN JAMIL [PENGURUS]", TableNo: "37" },
+{ EmployeeID: "920", Name: "MOHD MIRZA NAZHAN BIN MOHD USAL", TableNo: "37" },
+{ EmployeeID: "455", Name: "WAHIDA BINTI RAHIM", TableNo: "37" },
+{ EmployeeID: "339", Name: "NOR IDAYU BINTI AHMAD FAUZI", TableNo: "37" },
+{ EmployeeID: "615", Name: "NURUL SAADAH BINTI SAHIDIN", TableNo: "37" },
+{ EmployeeID: "911", Name: "NUR SUHAIZA BINTI JAMALUDIN", TableNo: "37" },
+{ EmployeeID: "974", Name: "MUHAMMAD AQIL DANIAL BIN FARIF ASWANDI", TableNo: "37" },
+{ EmployeeID: "563", Name: "AMERA BINTI MUSA", TableNo: "37" },
+
+{ EmployeeID: "049", Name: "NUR HIDAYAH BINTI YACOB", TableNo: "38" },
+{ EmployeeID: "1047", Name: "MUHAMMAD FAIZ SAUFI BIN MOHAMAD SHUKRI", TableNo: "38" },
+{ EmployeeID: "1029", Name: "MUHAMMAD HAFIZ AMIRUDDIN BIJ BAHREN", TableNo: "38" },
+{ EmployeeID: "10002", Name: "NUR SHERIL AIZA BT SHERIDAN [PENGURUS]", TableNo: "38" },
+{ EmployeeID: "10010", Name: "HAJI DOLLAH BIN ALI [PENGURUS]", TableNo: "38" },
+{ EmployeeID: "624", Name: "AHMAD SAEIH BIN BAKHTIAR", TableNo: "38" },
+{ EmployeeID: "791", Name: "MUHAMMAD SYAZWAN BIN SALIM MOHAMMAD", TableNo: "38" },
+{ EmployeeID: "682", Name: "MUHAMMAD ZULFAHIMI BIN ZAKARIA", TableNo: "38" },
+{ EmployeeID: "085", Name: "FADILAH BINTI ADZHA", TableNo: "38" },
+{ EmployeeID: "630", Name: "MUHAMMAD FAIZ BIN BOEMAN", TableNo: "38" },
+
+{ EmployeeID: "713", Name: "FAROUK BIN ROSLAN [PA]", TableNo: "39" },
+{ EmployeeID: "685", Name: "HARITH HAZWAN BIN AMIR", TableNo: "39" },
+{ EmployeeID: "715", Name: "MOHAMAD NOOR HADI BIN MOHD NOR [PPA]", TableNo: "39" },
+{ EmployeeID: "936", Name: "NUR SHARLIZA ARNI BINTI AZHARI", TableNo: "39" },
+{ EmployeeID: "650", Name: "NUR FATIHAH BINTI ABU BAKAR", TableNo: "39" },
+{ EmployeeID: "1033", Name: "NOOR ARIEF BIN NOOR HIDAYAT", TableNo: "39" },
+{ EmployeeID: "982", Name: "INTAN ZULAIKHA BINTI MOHD HANAFIAH", TableNo: "39" },
+{ EmployeeID: "635", Name: "MOHD ASYRAFF BIN MUHAMMAD ZIN", TableNo: "39" },
+{ EmployeeID: "579", Name: "NUR SYAFAWATI BINTI BAHARUDIN", TableNo: "39" },
+{ EmployeeID: "913", Name: "FAATIHAH BINTI MOHAMMAD JASNI", TableNo: "39" },
+
+{ EmployeeID: "490", Name: "IZZATUL ULYA BINTI ARZEMI", TableNo: "40" },
+{ EmployeeID: "947", Name: "NUR FATIHAH BINTI DAAN", TableNo: "40" },
+{ EmployeeID: "843", Name: "RABIATUL ADAWIYAH BINTI MOHD SUKRI", TableNo: "40" },
+{ EmployeeID: "623", Name: "MUHAMMAD HAIKAL BIN MOHAMAD FAHIMI", TableNo: "40" },
+{ EmployeeID: "155", Name: "NORANTASYA BINTI KADER", TableNo: "40" },
+{ EmployeeID: "130", Name: "NOOR DIANA BINTI KAMSURI", TableNo: "40" },
+{ EmployeeID: "827", Name: "AZRI SYAZWAN BIN AHMAD [PA]", TableNo: "40" },
+{ EmployeeID: "820", Name: "NUR AFIFAH ALIAH BT MOHD ROSHID", TableNo: "40" },
+{ EmployeeID: "888", Name: "SOFIA BINTI BANI", TableNo: "40" },
+{ EmployeeID: "716", Name: "MOHD AIZAT BIN AZHAR [PA]", TableNo: "40" },
+
+{ EmployeeID: "588", Name: "DR. MOHD SABRI BIN JAMALUDIN", TableNo: "41" },
+{ EmployeeID: "546", Name: "NUR HUSNA BINTI AHMAD JANI", TableNo: "41" },
+{ EmployeeID: "795", Name: "NUR ARINA BINTI ISMAIL", TableNo: "41" },
+{ EmployeeID: "137", Name: "FATIMAHTUZ ZAHRA BINTI AHMAD", TableNo: "41" },
+{ EmployeeID: "954", Name: "NUR ASYRANI BINTI SAINUDDIN", TableNo: "41" },
+{ EmployeeID: "805", Name: "NUR AFNI BINTI FAIZAL", TableNo: "41" },
+{ EmployeeID: "144", Name: "AZIRAWATI BINTI ISMAIL", TableNo: "41" },
+{ EmployeeID: "710", Name: "MUHAMMAD ADZRUL BIN SOBRI", TableNo: "41" },
+{ EmployeeID: "365", Name: "MOHD SHAFIQ BIN HASHIM [PPA]", TableNo: "41" },
+{ EmployeeID: "1076", Name: "AIMAN FARIS BIN MOHD ARIS", TableNo: "41" },
+
+{ EmployeeID: "775", Name: "ABUAMMAR BIN MOHD RASIDI [PA]", TableNo: "43" },
+{ EmployeeID: "1004", Name: "MUHAMMAD HAZIM BIN SABLI [PA]", TableNo: "43" },
+{ EmployeeID: "591", Name: "MUHAMMAD AMIRUL ASHRAF BIN ARMAN JUMAT [PPA]", TableNo: "43" },
+{ EmployeeID: "426", Name: "AINA SHAZZUANNA BINTI JAMHARI [PEN PENGURUS]", TableNo: "43" },
+{ EmployeeID: "138", Name: "NURAINI BINTI DAUD", TableNo: "43" },
+{ EmployeeID: "023", Name: "SITI NORHAMIRA BINTI AHYOB", TableNo: "43" },
+{ EmployeeID: "098", Name: "KHAIRUL SANI BIN ZAMBERI", TableNo: "43" },
+{ EmployeeID: "901", Name: "SAKINA BINTI IBRAHIM [PENGURUS]", TableNo: "43" },
+{ EmployeeID: "676", Name: "NUR ALYA RAIHAN BINTI MOHAMMAD SEHAINI", TableNo: "43" },
+
+{ EmployeeID: "776", Name: "MUHAMMAD SYUKERI BIN IBRAHIM", TableNo: "44" },
+{ EmployeeID: "980", Name: "HUSNI HUMAIRAH BINTI ADDI HISHAM", TableNo: "44" },
+{ EmployeeID: "340", Name: "FATIN LIDYA SYAFINAZ BINTI BADRUL AZMAN", TableNo: "44" },
+{ EmployeeID: "706", Name: "IMLANA BINTI RUM", TableNo: "44" },
+{ EmployeeID: "937", Name: "ARNISHA SYUHADA BINTI AZRUL", TableNo: "44" },
+{ EmployeeID: "891", Name: "NUR AININA BINTI MAT ZIN", TableNo: "44" },
+{ EmployeeID: "625", Name: "NORADAWIAH BINTI HUSIN", TableNo: "44" },
+{ EmployeeID: "642", Name: "NURUL IRDINA BINTI MOHD FHAISAL", TableNo: "44" },
+{ EmployeeID: "906", Name: "HURIN NABIHAH BINTI AHMAD FIRDAUS", TableNo: "44" },
+
+{ EmployeeID: "785", Name: "KHAIRUL AIMAN BIN ABDULLAH AYUB", TableNo: "45" },
+{ EmployeeID: "301", Name: "LYDIAWATI BINTI SAHARUDIN", TableNo: "45" },
+{ EmployeeID: "705", Name: "NORFAIRUZZANA BINTI MAT SHARRIF", TableNo: "45" },
+{ EmployeeID: "631", Name: "NURSHAHIRAH BINTI ZANI", TableNo: "45" },
+{ EmployeeID: "917", Name: "SYAHIRAH BINTI SA'DAN", TableNo: "45" },
+{ EmployeeID: "1005", Name: "FARHANA BINTI MUHAMMAD ZAINUL AZHAR", TableNo: "45" },
+{ EmployeeID: "1035", Name: "HUSNA QAISORAH BINTI JAAFAR", TableNo: "45" },
+{ EmployeeID: "847", Name: "NORHIDAYATUL ADAWIYAH AZMAN", TableNo: "45" },
+{ EmployeeID: "948", Name: "AMMAR ZUHDI BIN ABD MAJID", TableNo: "45" },
+
+
+
+];
+
+
+// Get query parameters from URL
+ const params = new URLSearchParams(window.location.search); 
+ const empIDInput = params.get('empID') || "";
+const luckyNo = params.get('lucky') || "N/A";
+
+
+ // Find matching staff by Employee ID 
+const matchedStaff = staffList.find( staff => staff.EmployeeID.replace(/^0+/, '') === empIDInput.replace(/^0+/, '') ); 
+
+// Display welcome message 
+const fullName = matchedStaff ? matchedStaff.Name : "Guest"; document.getElementById('welcomeMsg').textContent = `Selamat Datang, ${fullName}!`; 
+
+// Display table number and lucky draw number
+const tableNo = matchedStaff && matchedStaff.TableNo ? matchedStaff.TableNo : "N/A";
+const luckyNumberValue = matchedStaff ? matchedStaff.EmployeeID : "N/A";
+
+document.getElementById('tableNumber').textContent = tableNo;
+document.getElementById('luckyNumber').textContent = luckyNumberValue;
+
+
+  </script>
+</body>
+</html>
